@@ -44,7 +44,8 @@ module.exports = new PassportLocalStrategy({
         user: {
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          secret: user.secret
         }
       }
 

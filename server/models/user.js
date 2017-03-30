@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
   },
   password: String,
   name: String,
-  role: String
+  role: String,
+  secret: String
 });
 
 /**
