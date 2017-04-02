@@ -40,12 +40,13 @@ module.exports = new PassportLocalStrategy({
       }
 
       const payload = {
-        sub: user._id,
         user: {
+          id: user._id,
           email: user.email,
           name: user.name,
           role: user.role,
-          secret: user.secret
+          secret: user.secret,
+          backup_totp: user.backup_totp
         }
       }
 

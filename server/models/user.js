@@ -10,7 +10,8 @@ const UserSchema = new mongoose.Schema({
   password: String,
   name: String,
   role: String,
-  secret: String
+  secret: String,
+  backup_totp: Array
 });
 
 /**
