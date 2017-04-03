@@ -1,8 +1,7 @@
-const express = require('express');
-const validator = require('validator');
-const passport = require('passport');
-
-const router = new express.Router();
+const express = require('express')
+const validator = require('validator')
+const passport = require('passport')
+const router = new express.Router()
 
 /**
  * Validate the sign up form
@@ -115,7 +114,7 @@ router.post('/signup', (req, res, next) => {
       token
     });
   })(req, res, next);
-});
+})
 
 router.post('/login', (req, res, next) => {
   const validationResult = validateLoginForm(req.body);
@@ -149,7 +148,15 @@ router.post('/login', (req, res, next) => {
       token
     });
   })(req, res, next);
-});
+})
+
+router.put('/update/recovery_codes', (req, res, next) => {
+  if ( ! req.body.userid || ! req.body.totps ) return res.json({
+    error: 'Both User ID and recovery codes are required'
+  }).end()
+
+  require('../passport/local-update')(req, res, next)
+})
 
 
 module.exports = router;
