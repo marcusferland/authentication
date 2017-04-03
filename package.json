@@ -9,6 +9,10 @@
   "keywords": [
     "auth"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcusferland/authentication.git"
+  },
   "author": "Marc Ferland",
   "license": "MIT",
   "dependencies": {
