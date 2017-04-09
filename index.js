@@ -1,13 +1,8 @@
 const cluster = require('cluster')
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')
-const passport = require('passport')
-const numCPUs = require('os').cpus().length
-const config = require('./config')
 
 if (cluster.isMaster) {
 
+  const numCPUs = require('os').cpus().length
   console.log(`Master cluster setting up ${numCPUs} workers...`)
 
   for (var i = 0; i < numCPUs; i++) cluster.fork()
@@ -24,7 +19,11 @@ if (cluster.isMaster) {
 }
 else {
 
-  const app = express()
+  const app = require('express')()
+  const cors = require('cors')
+  const bodyParser = require('body-parser')
+  const passport = require('passport')
+  const config = require('./config')
 
   // connect to the database and load models
   require('./server/models').connect(config.dbUri)
