@@ -2,11 +2,11 @@ const db = require('../db')
 const ObjectID = require('mongodb').ObjectID
 const bcrypt = require('bcrypt')
 const GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator
-const TwoFAStartegy = require('passport-2fa-totp').Strategy
+const TwoFAStrategy = require('passport-2fa-totp').Strategy
 const config = require('./settings')
 
 module.exports = function (passport) {
-  const INVALID_LOGIN = 'Invalid username or password';
+  const INVALID_LOGIN = 'Invalid username, password, and/or TOTP code'
 
   passport.serializeUser(function (user, done) {
     return done(null, user._id)
@@ -15,17 +15,13 @@ module.exports = function (passport) {
   passport.deserializeUser(function (id, done) {
     const users = db.get().collection('users')
     users.findOne(new ObjectID(id), function (err, user) {
-      if (err) {
-        return done(err)
-      } else if (user === null) {
-        return done(null, false)
-      } else {
-        return done(null, user)
-      }
+      if (err) return done(err)
+      else if (user === null) return done(null, false)
+      else return done(null, user)
     })
   })
 
-  passport.use('login', new TwoFAStartegy({
+  passport.use('login', new TwoFAStrategy({
     usernameField: 'email',
     passwordField: 'password',
     codeField: 'code'
@@ -61,7 +57,7 @@ module.exports = function (passport) {
     }
   }))
 
-  passport.use('register', new TwoFAStartegy({
+  passport.use('register', new TwoFAStrategy({
       usernameField: 'username',
       passwordField: 'password',
       passReqToCallback: true,
@@ -70,18 +66,18 @@ module.exports = function (passport) {
     // 1st step verification: validate input and create new user
 
     if (!/^[A-Za-z0-9_]+$/g.test(req.body.username)) {
-      return done(null, false, { message: 'Invalid username' });
+      return done(null, false, { message: 'Invalid username' })
     }
 
     if (req.body.password.length === 0) {
-      return done(null, false, { message: 'Password is required' });
+      return done(null, false, { message: 'Password is required' })
     }
 
     if (req.body.password !== req.body.confirmPassword) {
-      return done(null, false, { message: 'Passwords do not match' });
+      return done(null, false, { message: 'Passwords do not match' })
     }
 
-    const users = db.get().collection('users');
+    const users = db.get().collection('users')
     users.findOne({ username: username}, function (err, user) {
       if (err) return done(err)
 
@@ -90,7 +86,7 @@ module.exports = function (passport) {
       }
 
       bcrypt.hash(password, null, null, function (err, hash) {
-        if (err) return done(err);
+        if (err) return done(err)
 
         var user = {
           username: username,

@@ -21,40 +21,99 @@ router.get('/login', function(req, res, next) {
 router.post('/login', function(req, res, next) {
   passport.authenticate('login', function (err, user, info) {
     if (err) return next(err)
-    if ( ! user) return res.status(200).send('No user account').end()
+    if ( ! user) return res.status(200).json({
+      err: err,
+      message: info
+    }).end()
 
     req.logIn(user, function(err) {
-      if (err) {
-        return next(err)
-      }
-      else {
-        const payload = {
-          user: {
-            id: user._id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-            secret: user.secret,
-            backup_totp: user.backup_totp
-          }
-        }
+      if (err) return next(err)
 
-        // create a token string
-        const token = jwt.sign(
-          payload,
-          config.jwtSecret, {
-            expiresIn: config.tokenExpires
-          }
-        )
-        return res.status(200).json({
-          token: token
-        }).end()
+      const payload = {
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          secret: user.secret
+        }
       }
+
+      // create a token string
+      const token = jwt.sign(
+        payload,
+        config.jwtSecret, {
+          expiresIn: config.tokenExpires
+        }
+      )
+
+      const refreshToken = 'marcusferlando'
+      return res.status(200).json({
+        err: err,
+        success: true,
+        token: token,
+        refreshToken: refreshToken
+      }).end()
     })
   })(req, res, next)
 })
 
-router.get('/register', function (req, res, next) {
+router.post('/token', function(req, res, next) {
+  if ( ! req.body.grant_type) return res.json({
+    err: 'Please specify a grant_type in your request.'
+  }).end()
+
+  if ( ! req.body.token) return res.json({
+    err: 'Please send a refresh token with your request.'
+  }).end()
+
+  switch (req.body.grant_type) {
+    case 'refresh_token':
+      const refreshTokens = db.get().collection('refreshTokens')
+      refreshTokens.findOne({ token: req.body.token }, function (err, token) {
+        if (err) return done(err)
+
+        if (token === null) return done(null, false, { message: INVALID_LOGIN })
+
+        if (token.userId) {
+          const users = db.get().collection('users')
+          users.findOne({ _id: ObjectID(token.userId) }, function (err, user) {
+            if (err) return done(err)
+
+            if (user === null) return done(null, false, { message: INVALID_LOGIN })
+
+            const payload = {
+              user: {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                secret: user.secret
+              }
+            }
+
+            // create a token string
+            const access_token = jwt.sign(
+              payload,
+              config.jwtSecret, {
+                expiresIn: config.tokenExpires
+              }
+            )
+
+            return res.json({
+              access_token: access_token
+            }).end()
+          })
+        }
+      })
+      break;
+    default: return res.json({
+      err: 'Please specify a grant_type in your request.'
+    }).end()
+  }
+})
+
+router.get('/register', function(req, res, next) {
   //
 })
 

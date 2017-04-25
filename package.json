@@ -29,6 +29,7 @@
     "jsonwebtoken": "^7.3.0",
     "mongodb": "^2.2.26",
     "mongoose": "^4.9.0",
+    "oauth2-server": "^2.4.1",
     "passport": "^0.3.2",
     "passport-2fa-totp": "0.0.1",
     "passport-local": "^1.0.0",
