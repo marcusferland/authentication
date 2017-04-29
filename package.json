@@ -24,6 +24,7 @@
     "body-parser": "^1.17.1",
     "connect-flash": "^0.1.1",
     "cors": "^2.8.1",
+    "crypto": "0.0.3",
     "express": "^4.15.2",
     "express-session": "^1.15.2",
     "jsonwebtoken": "^7.3.0",

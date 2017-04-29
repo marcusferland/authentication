@@ -7,6 +7,11 @@ const flash = require('connect-flash')
 const setupPassport = require('./config/passport')
 const db = require('./db')
 const routes = require('./routes')
+const twofa = require('./lib/2fa.js')
+
+twofa.generateBackupCodes(10, codes => {
+  console.log(codes)
+})
 
 app.use(cors())
 
