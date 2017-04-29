@@ -3,6 +3,7 @@ const router = express.Router()
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const db = require('../db')
+const token = require('../lib/token')
 const config = require('../config/settings')
 const ObjectID = require('mongodb').ObjectID
 const GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator
@@ -40,20 +41,29 @@ router.post('/login', function(req, res, next) {
       }
 
       // create a token string
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         payload,
         config.jwtSecret, {
           expiresIn: config.tokenExpires
         }
       )
 
-      const refreshToken = 'marcusferlando'
-      return res.status(200).json({
-        err: err,
-        success: true,
-        token: token,
-        refreshToken: refreshToken
-      }).end()
+      token.generateRandomToken(function(err, refreshToken) {
+        const refreshTokensCollection = db.get().collection('refreshTokens')
+
+        refreshTokensCollection.save({
+          "userId": ObjectID(user._id),
+          "token": refreshToken,
+          "expires": 86400
+        })
+
+        return res.status(200).json({
+          err: err,
+          success: true,
+          token: accessToken,
+          refreshToken: refreshToken
+        }).end()
+      })
     })
   })(req, res, next)
 })
