@@ -69,6 +69,7 @@ router.post('/login', function(req, res, next) {
 })
 
 router.post('/token', function(req, res, next) {
+
   if ( ! req.body.grant_type) return res.json({
     err: 'Please specify a grant_type in your request.'
   }).end()
@@ -81,16 +82,16 @@ router.post('/token', function(req, res, next) {
     case 'refresh_token':
       const refreshTokens = db.get().collection('refreshTokens')
       refreshTokens.findOne({ token: req.body.token }, function (err, token) {
-        if (err) return done(err)
+        if (err) return res.json({ error: err }).end()
 
-        if (token === null) return done(null, false, { message: INVALID_LOGIN })
+        if (token === null) return res.json({ error: 'No token found.' }).end()
 
         if (token.userId) {
           const users = db.get().collection('users')
           users.findOne({ _id: ObjectID(token.userId) }, function (err, user) {
-            if (err) return done(err)
+            if (err) return res.json({error: err }).end()
 
-            if (user === null) return done(null, false, { message: INVALID_LOGIN })
+            if (token === null) return res.json({ error: 'No user founds.' }).end()
 
             const payload = {
               user: {
