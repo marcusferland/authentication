@@ -61,7 +61,12 @@ router.post('/login', function(req, res, next) {
           err: err,
           success: true,
           token: accessToken,
-          refreshToken: refreshToken
+          refreshToken: refreshToken,
+          user: {
+            id: user._id,
+            email: user.email,
+            name: user.name
+          }
         }).end()
       })
     })
@@ -112,7 +117,12 @@ router.post('/token', function(req, res, next) {
             )
 
             return res.json({
-              access_token: access_token
+              access_token: access_token,
+              user: {
+                id: user._id,
+                email: user.email,
+                name: user.name
+              }
             }).end()
           })
         }
